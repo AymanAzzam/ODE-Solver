@@ -1,5 +1,6 @@
-module carry_look_ahead_16bit(a,b, result,overflow);
-input signed[15:0] a,b;
+module carry_look_ahead_adder_subtractor(a,b, result,overflow);
+input signed[15:0] a;
+input signed[15:0] b;
 output signed[15:0] result;
 output overflow;
 wire c1,c2,c3;

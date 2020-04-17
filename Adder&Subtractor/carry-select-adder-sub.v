@@ -1,15 +1,14 @@
-module borrow_select_subtractor(a,b,result,overflow);
+module carry_select_adder_subtractor(a,b,result,overflow);
 
-input [15:0]a;
-input [15:0]b;
-output [15:0]result;
-output overflow;
+output signed[15:0]result;
+input signed[15:0]a;
+input signed[15:0]b;
+output overflow; 
 
 wire [7:0] c0,c1;
 wire [7:0]c;
 wire [15:0]result0;
 wire [15:0]result1;
-//-----not sure yet ---review it and test it more -
 assign overflow = (~a[15]&b[15]&b[15])|(result[15]&(~a[15])&(~b[15]));
 
 //---------------with input carry = 0 
@@ -120,29 +119,29 @@ mux2X1 #(2) ms7(
 .out(result[15:14]),
 .c(c[7]));
 
-xor(overflow,c[6],c[7]);
+
 
 endmodule
 
-module FA_Block(a,b,Bin,result,borrow);
+module FA_Block(a,b,cin,sum,cout);
 input [1:0] a,b;
-input Bin;
-output [1:0] result;
-output borrow;
+input cin;
+output [1:0] sum;
+output cout;
 wire c1,c2;
-full_subtractor fa0(
+full_adder fa0(
 .a(a[0]),
 .b(b[0]),
-.Bin(Bin),
-.result(result[0]),
-.borrow(c1));
+.cin(cin),
+.sum(sum[0]),
+.cout(c1));
 
-full_subtractor fa1(
+full_adder fa1(
 .a(a[1]),
 .b(b[1]),
-.Bin(c1),
-.result(result[1]),
-.borrow(borrow));
+.cin(c1),
+.sum(sum[1]),
+.cout(cout));
 endmodule
 
 
@@ -162,27 +161,27 @@ endmodule
 
 
 /////////////////////
-//1bit Full Subtractor
+//1bit Full Adder
 /////////////////////
  
-module full_subtractor(a,b,Bin,result, borrow);
-input a,b,Bin;
-output result, borrow;
+module full_adder(a,b,cin,sum, cout);
+input a,b,cin;
+output sum, cout;
  
 wire x,y,z;
  
-half_subtractor h1(.a(a), .b(b), .result(x), .borrow(y));
-half_subtractor h2(.a(x), .b(Bin), .result(result), .borrow(z));
-or or_1(borrow,z,y);
+half_adder h1(.a(a), .b(b), .sum(x), .cout(y));
+half_adder h2(.a(x), .b(cin), .sum(sum), .cout(z));
+or or_1(cout,z,y);
 endmodule
  
 //////////////////////
-// 1 bit Half Subtractor
+// 1 bit Half Adder
 //////////////////////
  
-module half_subtractor( a,b, result, borrow );
+module half_adder( a,b, sum, cout );
 input a,b;
-output result, borrow;
-xor xor_1 (result,a,b);
-and and_1 (borrow,~a,b);
+output sum, cout;
+xor xor_1 (sum,a,b);
+and and_1 (cout,a,b);
 endmodule
