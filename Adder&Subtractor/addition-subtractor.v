@@ -6,10 +6,9 @@ module addition #(parameter N=16 )
    );
 
 assign result = A + B; 
-assign overflow= (~A[15]&A[15]&B[15])|(result[15]&(~A[15])&(~B[15]));
+assign overflow= (~result[15]&A[15]&B[15])|(result[15]&(~A[15])&(~B[15]));
 
  
-
    
    
 endmodule;
