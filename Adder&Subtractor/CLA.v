@@ -1,5 +1,4 @@
-
-module CLA
+module Add_Sub
 #(      
     parameter DATA_WIDTH = 16
  )
