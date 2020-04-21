@@ -52,6 +52,7 @@ def main():
         input_file = open('input.json')
     except IOError:
         print("ERROR: Please make sure that a readable input.json file exists in the current directory")
+        input("Press Enter to exit...")
         sys.exit()
 
     input_data = json.load(input_file)
@@ -78,54 +79,67 @@ def main():
 
     if n not in constants.N_RANGE:
         print("ERROR: N is out of range")
+        input("Press Enter to exit...")
         sys.exit()
 
     if m not in constants.M_RANGE:
         print("ERROR: M is out of range")
+        input("Press Enter to exit...")
         sys.exit()
 
     if solver_mode not in constants.SOLVER_MODES:
         print("ERROR: No such mode (" + str(solver_mode) + ")exists")
+        input("Press Enter to exit...")
         sys.exit()
 
     if time_step < 0:
         print("ERROR: Time step 'h' can't have a negative value")
+        input("Press Enter to exit...")
         sys.exit()
 
     if error_tolerance < 0:
         print("ERROR: Error tolerance can't have a negative value")
+        input("Press Enter to exit...")
         sys.exit()
 
     if precision not in constants.PRECISION:
         print("ERROR: No such precision (" + str(precision) + ")exists")
+        input("Press Enter to exit...")
         sys.exit()
 
     if time_steps_count < 0:
         print("ERROR: Count of time steps needed can't have a negative value")
+        input("Press Enter to exit...")
         sys.exit()
 
     if a.shape != (n, n):
         print("ERROR: Incorrect matrix A dimensions")
+        input("Press Enter to exit...")
         sys.exit()
 
     if b.shape != (n, m):
         print("ERROR: Incorrect matrix B dimensions")
+        input("Press Enter to exit...")
         sys.exit()
 
     if x0.shape != (n,):
         print("ERROR: Incorrect vector X0 dimension")
+        input("Press Enter to exit...")
         sys.exit()
 
     if t.shape != (time_steps_count,):
         print("ERROR: Count of time steps needed doesn't match length of array T")
+        input("Press Enter to exit...")
         sys.exit()
 
     if u0.shape != (m,):
         print("ERROR: Incorrect vector U0 dimension")
+        input("Press Enter to exit...")
         sys.exit()
 
     if us.shape != (time_steps_count, m):
         print("ERROR: Incorrect vector Us dimension")
+        input("Press Enter to exit...")
         sys.exit()
 
     print("- Input is valid")
@@ -198,6 +212,10 @@ def main():
     print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     print("+++++++++++ CPU data parsing has completed successfully. Check file 'output.txt' +++++++++++")
     print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("\n")
+
+    input("Press Enter to exit...")
+
 
 if __name__ == "__main__":
     main()
