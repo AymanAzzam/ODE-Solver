@@ -47,7 +47,7 @@ def run_length_encoding(uncompressed_data):
 
 def main():
     ################################# LOAD JSON FILE ###############################
-
+    print("- Loading input.json file")
     try:
         input_file = open('input.json')
     except IOError:
@@ -218,4 +218,10 @@ def main():
 
 
 if __name__ == "__main__":
+    print("\n")
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("+++++++++++++++++++++ CPU data parser for ODE solver accelerator chip ++++++++++++++++++++++")
+    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+    print("\n")
+
     main()
