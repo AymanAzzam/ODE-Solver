@@ -26,7 +26,7 @@ def convert_to_binary(value, number_of_bits, number_type):
 
 
 def run_length_encoding(uncompressed_data):
-    compressed_data = []
+    compressed_data = ""
     for row in uncompressed_data:
         temp_row = ""
         count = 0
@@ -40,9 +40,14 @@ def run_length_encoding(uncompressed_data):
                 count = 1
                 element = i
         temp_row = temp_row + element + convert_to_binary(count, constants.RUN_BITS_SIZE, "integer")
-        compressed_data.append(temp_row)
+        compressed_data += temp_row
 
     return compressed_data
+
+
+def reformat_data(data):
+    reformatted_data = " ".join(data[i:i + constants.BUS_SIZE] for i in range(0, len(data), constants.BUS_SIZE))
+    return reformatted_data
 
 
 def main():
@@ -150,13 +155,13 @@ def main():
 
     output_data = []
 
-    temp_row = convert_to_binary(n, constants.DATA_SIZE, "integer")
-    temp_row = temp_row + convert_to_binary(m, constants.DATA_SIZE, "integer")
-    temp_row = temp_row + convert_to_binary(solver_mode, constants.DATA_SIZE, "integer")
-    temp_row = temp_row + convert_to_binary(time_step, constants.DATA_SIZE, "fixed")
-    temp_row = temp_row + convert_to_binary(error_tolerance, constants.DATA_SIZE, "fixed")
-    temp_row = temp_row + convert_to_binary(precision, constants.DATA_SIZE, "integer")
-    temp_row = temp_row + convert_to_binary(time_steps_count, constants.DATA_SIZE, "integer")
+    temp_row = convert_to_binary(n, 6, "integer")
+    temp_row = temp_row + convert_to_binary(m, 6, "integer")
+    temp_row = temp_row + convert_to_binary(solver_mode, 1, "integer")
+    temp_row = temp_row + convert_to_binary(time_step, 16, "fixed")
+    temp_row = temp_row + convert_to_binary(error_tolerance, 16, "fixed")
+    temp_row = temp_row + convert_to_binary(precision, 2, "integer")
+    temp_row = temp_row + convert_to_binary(time_steps_count, 4, "integer")
 
     output_data.append(temp_row)
 
@@ -201,11 +206,16 @@ def main():
     compressed_output_data = run_length_encoding(output_data)
     print("- Compression complete")
 
+    ############################## REFORMAT DATA ###############################
+
+    print("- Reformatting data...")
+    compressed_output_data = reformat_data(compressed_output_data)
+    print("- Reformatting complete")
+
     ############################### OUTPUT DATA ################################
 
     output_file = open("output.txt", "w+")
-    for row in compressed_output_data:
-        output_file.write(row + "\n")
+    output_file.write(compressed_output_data + "\n")
     output_file.close()
 
     print("\n")
@@ -213,6 +223,9 @@ def main():
     print("+++++++++++ CPU data parsing has completed successfully. Check file 'output.txt' +++++++++++")
     print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
     print("\n")
+
+    # print(output_data)
+    # print(compressed_output_data)
 
     input("Press Enter to exit...")
 
