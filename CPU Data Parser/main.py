@@ -46,7 +46,9 @@ def run_length_encoding(uncompressed_data):
 
 
 def reformat_data(data):
+    last_packet_size = len(data) % constants.BUS_SIZE
     reformatted_data = " ".join(data[i:i + constants.BUS_SIZE] for i in range(0, len(data), constants.BUS_SIZE))
+    reformatted_data = reformatted_data + (constants.BUS_SIZE - last_packet_size) * "0"
     return reformatted_data
 
 
