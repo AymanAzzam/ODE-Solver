@@ -7,7 +7,8 @@ module Add_Sub
     input signed[DATA_WIDTH-1 : 0] A,
     input signed[DATA_WIDTH-1 : 0] B,
     output[DATA_WIDTH-1 : 0 ] result,
-	output overflow
+	output overflow,
+	input cin
     
 );
 
@@ -28,7 +29,7 @@ assign overflow = (~result[DATA_WIDTH-1]&A[DATA_WIDTH-1]&B[DATA_WIDTH-1])|(resul
 				.in1(result1[1:0]),
 				.c0(c0[0]),
 				.c1(c1[0]),
-				.sel(1'b0),
+				.sel(cin),
 				.out(result[1:0]),
 				.c(c[0]));
 								

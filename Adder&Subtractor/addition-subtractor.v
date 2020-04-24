@@ -7,11 +7,12 @@ module Add_Sub
     input signed[DATA_WIDTH-1 : 0] A,
     input signed[DATA_WIDTH-1 : 0] B,
     output[DATA_WIDTH-1 : 0 ] result,
-	output overflow
+	output overflow, 
+	input cin
     
 );
 
-assign result = A + B; 
+assign result = A + B+cin; 
 assign overflow = (~result[DATA_WIDTH-1]&A[DATA_WIDTH-1]&B[DATA_WIDTH-1])|(result[DATA_WIDTH-1]&(~A[DATA_WIDTH-1])&(~B[DATA_WIDTH-1]));
 
  

@@ -7,11 +7,12 @@ module Add_Sub
     input signed[DATA_WIDTH-1 : 0] A,
     input signed[DATA_WIDTH-1 : 0] B,
     output[DATA_WIDTH-1 : 0 ] result,
-	output overflow
+	output overflow,
+	input cin
     
 );
 wire[DATA_WIDTH /4: 0 ] c;
-assign c[0] = 1'b0;
+assign c[0] = cin;
 
 genvar      i;
 
