@@ -12,39 +12,47 @@ module IOFeeder (input clk,
     
     always @(posedge clk, posedge reset) begin
         if (reset) begin
+            // Open file for reading
             dataFile = $fopen("output.txt", "rb");
+            // Missing file error catching
             if (dataFile == 0) begin
                 $display("ERROR: dataFile handle is NULL");
                 $finish;
             end
+            // Prepare first data packet
             scanFile <= $fscanf(dataFile, "%b", inputData);
-            // Send load command + interrupt signal to notify the chip to receive a data packet
-            intrptSignal  <= 1;
-            cmdSignal     <= 1;
+            // Set load command control signal + interrupt signal to notify the chip to receive a data packet
+            intrptSignal <= 1;
+            cmdSignal    <= 1;
         end
         else begin
-            if (dataFile) begin
-                if (!$feof(dataFile)) begin
-                    if (done && intrptSignal) begin
-                        scanFile <= $fscanf(dataFile, "%b", inputData);
-                        // Send load command + interrupt signal to notify the chip to receive a data packet
-                        $display("scanFile = %d", scanFile);
-                        intrptSignal  <= 0;
+            if (dataFile) begin // Send data as long as the file is open
+                if (done) begin // Prepare a new data packet, whenever the I/O module receives a data packet
+                    scanFile <= $fscanf(dataFile, "%b", inputData);
+                    if (!$feof(dataFile)) begin
+                        intrptSignal <= 0; // If there are data to be sent, inform the I/O module to wait by suppressing the interrupt signal until the new data is prepared
                     end
-                    else begin
+                    else begin // Otherwise, send 'process' command and close the file
                         intrptSignal <= 1;
+                        cmdSignal    <= 0;
+                        $fclose(dataFile);
+                        dataFile <= 0;
                     end
                 end
-                else begin
-                    intrptSignal  <= 1;
-                    cmdSignal     <= 0;
+                else begin // Inform the I/O module of the new data packet on the falling edge of the 'done' signal
+                    intrptSignal <= 1;
+                end
+            end
+            else begin // Receive results whenever the accelerator chip finishes data processing
+                if (done) begin
+                    // Receive data from I/O module
                 end
             end
         end
     end
-
+    
     assign dataBus = inputData;
-    assign intrpt = intrptSignal;
-    assign cmd = cmdSignal;
-
+    assign intrpt  = intrptSignal;
+    assign cmd     = cmdSignal;
+    
 endmodule
