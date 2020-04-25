@@ -37,16 +37,6 @@ reg [0 : 0] done;
 reg [4 : 0] enable;
 integer i,j;
 
-wire overflow;
-wire [31 : 0]dec_start,new_start;
-reg [31 : 0] dec_index_start;
-
-Add_Sub(index_start,~dec_start,new_start,overflow,1'b1);
-
-always @(negedge) begin
-	if()
-end
-
 assign number_test = number;
 assign temp1_test = temp1;
 assign temp2_test = temp2;
