@@ -27,10 +27,33 @@ initial begin
 	index_end_temp = 70;
 	enable[0] = 1'b1;
 	enable[2] = 1'b1;
+	temp1 = 0;
+	temp2 = 0;
 	number = 0;
+	WR_RD1[1 : 0] = 2'b00;
+	WR_RD2[1 : 0] = 2'b00;
+	WR_RD3[1 : 0] = 2'b00;
+	WR_RD4[1 : 0] = 2'b00;
+	done[0] = 1'b0;
+	enable_step[0] = 1'b0;
+	enable_euler[0] = 1'b0;
 end
 
-// Decode Data and Shift Decoded
+//Reset Signals 
+always @(posedge clk) begin
+	if(rst) begin
+		index_start = 70;
+		index_end = 70;
+		index_end_temp = 70;
+		enable[0] = 1'b1;
+		enable[2] = 1'b1;
+		temp1 = 0;
+		temp2 = 0;
+		number = 0;
+	end
+end
+
+//Decode Data and Shift Decoded
 always @(negedge clk) begin
 	if(load_process && interrupt && enable[0]) begin
 		//************* Shift Old Decoded Data *************//
