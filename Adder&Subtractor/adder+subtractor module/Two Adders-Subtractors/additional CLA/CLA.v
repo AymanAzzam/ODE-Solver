@@ -20,7 +20,7 @@ assign C[0] = cin ;
 
     genvar i;
     generate 
-        for ( i = 0; i <= DATA_WIDTH; i = i + 1 )
+        for ( i = 0; i < DATA_WIDTH; i = i + 1 )
         begin
            CLA_bit U1 (
                          .A( A[i] ),
