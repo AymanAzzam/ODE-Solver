@@ -10,9 +10,8 @@ input reset;
 wire [15:0] sum,diff;
 wire o;
 
-Add_Sub adder(.A(A),.B(M),.result(sum),.overflow(o));
-Add_Sub sub(.A(A),.B(-M),.result(diff),.overflow(o));
-
+Add_Sub adder(.A(A),.B(M),.result(sum),.overflow(o),.cin('b0));
+Add_Sub sub(.A(A),.B(~M),.result(diff),.overflow(o),.cin('b1));
 always @(posedge clk)
 begin
 

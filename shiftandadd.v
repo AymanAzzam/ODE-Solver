@@ -12,7 +12,7 @@ wire [15:0] sum;
 wire ov;
 input clk,reset;
 
-Add_Sub adder (.A(y[31:16]),.B(x),.result(sum),.overflow(ov));
+Add_Sub adder (.A(y[31:16]),.B(x),.result(sum),.overflow(ov),.cin('b0));
 
 always @(posedge clk)
 
