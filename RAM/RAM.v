@@ -1,4 +1,4 @@
-module ram (clk,
+module RAM (clk,
             address_1,
             address_2,
             address_3,
@@ -59,25 +59,29 @@ module ram (clk,
 
         if (WR_signal_1) begin
             RAM_1[address_1] <= data_write_1;
-        else
+        end
+        else begin
             data_read_1 <= RAM_1[address_1];
         end
 
         if (WR_signal_2) begin
             RAM_2[address_2] <= data_write_2;
-        else
+        end
+        else begin
             data_read_2 <= RAM_2[address_2];
         end
 
         if (WR_signal_3) begin
             RAM_3[address_3] <= data_write_3;
-        else
+        end
+        else begin
             data_read_3 <= RAM_3[address_3];
         end
 
         if (WR_signal_4) begin
             RAM_4[address_4] <= data_write_4;
-        else
+        end
+        else begin
             data_read_4 <= RAM_4[address_4];
         end
 
