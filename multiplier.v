@@ -21,7 +21,7 @@ reg signed [31:0] bin=32'b0000000000000000000000010000000 ;// smallest value use
 shiftadd s(result,multiplicand,multiplier,clk,reset);
 
 assign overflow_flag = (result >32'b00000000011111111111111100000000) ?  1'b1 :
-                       // (result==32'b11111111111111111111111100000000)?1'b1:
+                        (result==32'b11111111111111111111111100000000)?1'b1:
                         1'b0;
 
 
