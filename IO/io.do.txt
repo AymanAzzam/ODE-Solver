@@ -1,0 +1,193 @@
+vsim -gui work.io
+add wave -position insertpoint  \
+sim:/io/clk \
+sim:/io/rst \
+sim:/io/interrupt \
+sim:/io/load_process \
+sim:/io/data_in \
+sim:/io/done \
+sim:/io/number \
+sim:/io/cmp1 \
+sim:/io/cmp2 \
+sim:/io/index_start \
+sim:/io/index_end \
+sim:/io/index_end_temp \
+sim:/io/temp1 \
+sim:/io/temp2 \
+sim:/io/count \
+sim:/io/count_temp \
+sim:/io/n \
+sim:/io/m \
+sim:/io/mode \
+sim:/io/fixed_point \
+sim:/io/decoded \
+sim:/io/data_out \
+sim:/io/done_result \
+sim:/io/from_ram4 \
+sim:/io/to_ram1 \
+sim:/io/to_ram2 \
+sim:/io/to_ram3 \
+sim:/io/to_ram4 \
+sim:/io/address1 \
+sim:/io/address2 \
+sim:/io/address3 \
+sim:/io/address4 \
+sim:/io/WR_RD1 \
+sim:/io/WR_RD2 \
+sim:/io/WR_RD3 \
+sim:/io/WR_RD4 \
+sim:/io/enable_step \
+sim:/io/enable_euler \
+sim:/io/fixed 
+force -freeze sim:/io/clk 1 0, 0 {50 ns} -r 100
+force -freeze sim:/io/rst 1'b1 0
+run
+force -freeze sim:/io/rst 1'b0 0
+force -freeze sim:/io/data_in 32'b01001010010010010001100101110100 0
+force -freeze sim:/io/interrupt 1'b1 0
+force -freeze sim:/io/load_process 1'b1 0
+run
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b10100010100101110110100100011001 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b00011001001010010001011110010001 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b10010010101001110001100101110111 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b00011010000110100010101000010101 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b10010111011100011001000110010111 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b01101010011100100101101101110101 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b10010111011100011001001010010111 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b00010111010010100010100101101001 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b00011001011101101010011101101001 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b01110011010110010001100101110110 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b10100111001001110100101000101001 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b01101001011101111001001010010111 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b01111001011101111001011100100110 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b10100001100100101010011100011001 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b01001010001010010110100100101001 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b00101010011110100010101000101010 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b00010110101000011001001010100110 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+force -freeze sim:/io/interrupt 1'b0 0
+run
+force -freeze sim:/io/data_in 32'b10010001100101110010000000000000 0
+force -freeze sim:/io/interrupt 1'b1 0
+run
+run
+run
+run
+run
