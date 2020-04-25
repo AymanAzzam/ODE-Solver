@@ -2,8 +2,10 @@
 module io
 (
     input clk,rst,interrupt,load_process,
-    inout [31 : 0] data,
+    input reg [31 : 0] data_in,
+    output reg [31 : 0] data_out,
     input reg [0 : 0] done_result,
+    input reg [63 : 0] from_ram4,
     output reg [63 : 0] to_ram1,to_ram2,to_ram3,to_ram4,
     output reg [63 : 0] address1,address2,address3,address4,
     output reg [1 : 0] WR_RD1, WR_RD2, WR_RD3, WR_RD4,
@@ -14,11 +16,11 @@ module io
 reg [5 : 0] n,m;
 reg [0 : 0] mode;
 reg [1 : 0] fixed_point;
-reg [3 : 0] count;
+reg [3 : 0] count,count_temp;
 reg [70 : 0] decoded;
 reg [3 : 0] enable;
 integer index_start,index_end,index_end_temp;
-integer number,temp1,temp2,cmp1,cmp2;
+integer number,cmp1,cmp2;
 integer i,j;
 
 initial begin
@@ -27,8 +29,6 @@ initial begin
 	index_end_temp = 70;
 	enable[0] = 1'b1;
 	enable[2] = 1'b1;
-	temp1 = 0;
-	temp2 = 0;
 	number = 0;
 	WR_RD1[1 : 0] = 2'b00;
 	WR_RD2[1 : 0] = 2'b00;
@@ -47,9 +47,14 @@ always @(posedge clk) begin
 		index_end_temp = 70;
 		enable[0] = 1'b1;
 		enable[2] = 1'b1;
-		temp1 = 0;
-		temp2 = 0;
 		number = 0;
+		WR_RD1[1 : 0] = 2'b00;
+		WR_RD2[1 : 0] = 2'b00;
+		WR_RD3[1 : 0] = 2'b00;
+		WR_RD4[1 : 0] = 2'b00;
+		done[0] = 1'b0;
+		enable_step[0] = 1'b0;
+		enable_euler[0] = 1'b0;
 	end
 end
 
@@ -65,14 +70,16 @@ always @(negedge clk) begin
 		end
 		//************* Decode New Data *************//
 		for(i = 31; i > 0; i = i - 4) begin
-			for(j = 0; j < data[i-1 -: 3]; j = j + 1) begin
-				decoded[index_end] = data[i];
+			for(j = 0; j < data_in[i-1 -: 3]; j = j + 1) begin
+				decoded[index_end] = data_in[i];
 				index_end = index_end - 1;
 			end
 		end
 		index_start = 70;
 		enable[1] = 1'b1;
 		enable[0] = 1'b0;
+		i = 0;
+		j = 0;
 	end
 end
 
@@ -127,38 +134,43 @@ always @(posedge clk) begin
 			index_start = index_start - 2;
 		end else if(number ==6 && index_end - index_start >= 4) begin	//Count
 			count[3 : 0] = decoded[index_start -: 4];
+			count_temp[3 : 0] = count[3 : 0]; 
 
 			number = number + 1;
 			index_start = index_start - 4;
 		end else if (number < 13 && index_end - index_start >= 16) begin
 			if(number == 7) begin						//Matrix A
 				to_ram2[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address2 = 0 + 4*(n*temp2 + temp1);
+				address2 = 0 + 4*(n*j + i);
 				WR_RD2[1] = 1;	
 			end else if(number == 8) begin					//Matrix B
 				to_ram3[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address3 = 0 + 4*(m*temp2 + temp1);
+				address3 = 0 + 4*(m*j + i);
 				WR_RD3[1] = 1;
 			end else if(number == 9) begin					//Matrix X0
 				to_ram4[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address4 = 0 + 4*temp1;
+				address4 = 0 + 4*i;
 				WR_RD4[1] = 1;
 			end else if(number == 10) begin					//Matrix T
 				to_ram1[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
-				address1 = 0 + 4*temp1;
+				address1 = 0 + 4*i;
 				WR_RD1[1] = 1;
+
+				to_ram4[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
+				address4 = 0 + 4*i;
+				WR_RD4[1] = 1;
 			end else if(number == 11) begin					//Matrix U0
 				to_ram1[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address1 = 0 + 4*temp1;
+				address1 = 0 + 4*i;
 				WR_RD1[1] = 1;
 			end else if(number == 12) begin					//Matrix Us
 				to_ram1[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address1 = 0 + 4*(m*temp2 + temp1);
+				address1 = 0 + 4*(m*j + i);
 				WR_RD1[1] = 1;
 			end
 			index_start = index_start - 16; 
 			if(number >= 7 && number <=12) begin
-				temp1 = temp1 + 1;
+				i = i + 1;
 				if(number == 7) begin				//Matrix A
 					cmp1[5 : 0] = n[5 : 0];
 					cmp2[5 : 0] = n[5 : 0];
@@ -167,24 +179,24 @@ always @(posedge clk) begin
 					cmp2[5 : 0] = n[5 : 0];
 				end else if(number == 9) begin			//Matrix X0
 					cmp1[5 : 0] = n[5 : 0];
-					cmp2 = temp2;	
+					cmp2 = j;	
 				end else if(number == 10) begin			// Matrix T
 					cmp1[3 : 0] = count[3 : 0];
-					cmp2 = temp2;
+					cmp2 = j;
 				end else if(number == 11) begin			//Matrix U0
 					cmp1[5 : 0] = m[5 : 0];
-					cmp2 = temp2;
+					cmp2 = j;
 				end else begin					//Matrix Us
 					cmp1[5 : 0] = m[5 : 0];
 					cmp2[3 : 0] = count[3 : 0];
 				end
-				if(temp1 == cmp1 && temp2 == cmp2) begin	//done this matrix
-					temp1 = 0;
-					temp2 = 0;
+				if(i == cmp1 && j == cmp2) begin	//done this matrix
+					i = 0;
+					j = 0;
 					number = number + 1;
-				end else if(temp1 == cmp1) begin		//done row in matrix
-					temp1 = 0;
-					temp2 = temp2 + 1;
+				end else if(i == cmp1) begin		//done row in matrix
+					i = 0;
+					j = j + 1;
 				end
 			end
 		end else
@@ -196,28 +208,70 @@ end
 
 //Coordinator
 always @(posedge clk) begin
-	if(!load_process && interrupt && count > 0 && enable[2]) begin
+	if(!load_process && interrupt && count_temp > 0 && enable[2]) begin
 		enable_euler[0] = 1'b1;
 		if(mode[0])
 			enable_step[0] = 1'b1;
 		fixed[1 : 0] = fixed_point[1 : 0];
 		enable[2] = 1'b0;
 	end
-	if(done_result[0] && count > 0)
-		count = count - 1;
-	if(count == 0)
-		enable[3] = 1;
+	if(done_result[0] && count_temp > 0)
+		count_temp = count_temp - 1;
+	if(count_temp == 0) begin
+		enable_step = 1'b0;
+		enable_euler = 1'b0;
+		enable[3] = 1'b1;
+		i = 0;
+		j = 0;
+		mode[0] = 0;
+	end
 end
 
-//Read Data from Ram and write in IO 
+//Send Results to IO
+always @(negedge clk) begin
+	if(enable[3] && count > 0)	begin
+		if(mode[0] == 1'b0) begin
+			data_out[31 : 0] = {{22{1'b0}},n[5 : 0],count[3 : 0]};
+			done[0] = 1'b1;
+			mode[0] = 1'b1;	
+		end else begin
+			data_out[31 : 0] = from_ram4[31 : 0];
+			done[0] = 1'b1;
+		end
+	end
+end
+
+
+//Read Data from Ram 
+always @(posedge clk) begin
+	if(enable[3] && count > 0)	begin
+		if(mode[0] == 1'b1) begin
+			done[0] = 1'b0;
+
+			address4 = 0 + 4*(n*j + i);
+			WR_RD4[0] = 1'b1;
+
+			i = i + 1;
+			if(j[3 : 0] == count[3 : 0] && i[5 : 0] == n[5 : 0])
+				enable[3] = 1'b0;
+			else if(i[5 : 0] == n[5 : 0]) begin
+				i = 0;
+				j = j + 1;
+			end
+		end
+	end
+end
+
 
 //Return Signals to zero
 always @(negedge clk) begin
-	WR_RD1[1 : 0] = 2'b00;
-	WR_RD2[1 : 0] = 2'b00;
-	WR_RD3[1 : 0] = 2'b00;
-	WR_RD4[1 : 0] = 2'b00;
-	done[0] = 1'b0;
+	if(enable[3] == 1'b0) begin
+		WR_RD1[1 : 0] = 2'b00;
+		WR_RD2[1 : 0] = 2'b00;
+		WR_RD3[1 : 0] = 2'b00;
+		WR_RD4[1 : 0] = 2'b00;
+		done[0] = 1'b0;
+	end
 end
 
 
