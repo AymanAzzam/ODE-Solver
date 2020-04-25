@@ -37,6 +37,26 @@ reg [0 : 0] done;
 reg [4 : 0] enable;
 integer i,j;
 
+wire overflow;
+wire [31 : 0]dec_start,new_start;
+reg [31 : 0] dec_index_start;
+
+Add_Sub(index_start,~dec_start,new_start,overflow,1'b1);
+
+always @(negedge clk) begin
+	if(number == 0 || number == 1)
+		dec_index_start = 6;
+	else if (number == 2)
+		dec_index_start = 1;
+	else if (number == 3 || number == 4)
+		dec_index_start = 16;
+	else if (number == 5)
+		dec_index_start = 2;
+	else if (number == 6)
+		dec_index_start = 4;
+end
+assign dec_start = dec_index_start;
+
 assign number_test = number;
 assign temp1_test = temp1;
 assign temp2_test = temp2;
@@ -142,7 +162,7 @@ always @(posedge clk) begin
 			WR_RD2[0] = 1'b1;
 			
 			number = number + 1;
-			index_start = index_start - 6;
+			index_start = new_start;
 		end else if(number == 1 && index_start - index_end >= 6) begin		//m
 			m[5 : 0] = decoded[index_start -: 6];
 			
@@ -151,37 +171,37 @@ always @(posedge clk) begin
 			WR_RD1[0] = 1'b1;
 	
 			number = number + 1;
-			index_start = index_start - 6;
+			index_start = new_start;
 		end else if(number == 2 && index_start - index_end >= 1 ) begin		//mode
 			mode[0] = decoded[index_start];
 		
 			number = number + 1;
-			index_start = index_start - 1;
+			index_start = new_start;
 		end else if(number == 3 && index_start - index_end >= 16) begin		//H	
 			to_ram4[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
 			address4 = 0;
 			WR_RD4[0] = 1'b1;
 	
 			number = number + 1;
-			index_start = index_start - 16;
+			index_start = new_start;
 		end else if(number == 4 && index_start - index_end >= 16) begin		//Tolerance
 			to_ram4[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
 			address4 = 0;
 			WR_RD4[0] = 1'b1;	
 
 			number = number + 1;
-			index_start = index_start - 16;
+			index_start = new_start;
 		end else if(number == 5 && index_start - index_end >= 2) begin		//Fixed_point
 			fixed_point[1 : 0] = decoded[index_start -: 2];
 
 			number = number + 1;
-			index_start = index_start - 2;
+			index_start = new_start;
 		end else if(number ==6 && index_start - index_end >= 4) begin	//Count
 			count[3 : 0] = decoded[index_start -: 4];
 			count_temp[3 : 0] = count[3 : 0]; 
 
 			number = number + 1;
-			index_start = index_start - 4;
+			index_start = new_start;
 		end else if (number>=7 && index_start - index_end >= 16) begin
 			if(number == 7) begin						//Matrix A
 				to_ram2[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
