@@ -5,20 +5,20 @@ module io
     inout [31 : 0] data,
     output done_cpu,
     inout [63 : 0] ram1_data,ram2_data,ram3_data,ram4_data,
-    output [63 : 0] ram1_address,ram2_address,ram3_address,ram4_address,
+    output [15 : 0] ram1_address,ram2_address,ram3_address,ram4_address,
     output ram1_WR_RD, ram2_WR_RD, ram3_WR_RD, ram4_WR_RD,
     output en_step,en_euler,
     output [1 : 0] fixed_point_out,
     input done_result,
     output [31 : 0]number_test,temp1_test,temp2_test,
-    output [31 : 0]n_test,m_test,mode_test,fixed_point_test,count_test
+    output [31 : 0]n_test,m_test,mode_test,fixed_point_test,count_test,index_start_test,index_end_test,enable_test
 );
 
-integer index_start,index_end,index_end_temp;
+reg[15 : 0] index_start,index_end,index_end_temp;
 reg [70 : 0] decoded;
 
-integer number,cmp1,cmp2;
-integer temp1,temp2;
+reg[15 : 0] number,cmp1,cmp2;
+reg[15 : 0] temp1,temp2;
 
 reg [5 : 0] n,m;
 reg [3 : 0] count,count_temp;
@@ -26,7 +26,7 @@ reg [0 : 0] mode;
 reg [1 : 0] fixed_point;
 
 reg [63 : 0] to_ram1,to_ram2,to_ram3,to_ram4;
-reg [63 : 0] address1,address2,address3,address4;
+reg [15 : 0] address1,address2,address3,address4;
 reg [0 : 0] WR_RD1, WR_RD2, WR_RD3, WR_RD4;
 
 reg [0 : 0] enable_step,enable_euler;
@@ -38,8 +38,8 @@ reg [4 : 0] enable;
 integer i,j;
 
 wire overflow;
-wire [31 : 0]dec_start,new_start,mul_result,mul_temp2,plus_address,start_address,new_address,new_number;
-reg [31 : 0] dec_index_start, start_address_reg,mul_temp2_reg;
+wire [15 : 0]dec_start,new_start,mul_result,mul_temp2,plus_address,start_address,new_address,new_number;
+reg [15 : 0] dec_index_start, start_address_reg,mul_temp2_reg;
 
 assign dec_start = dec_index_start;
 assign start_address = start_address_reg;
@@ -54,6 +54,9 @@ assign m_test = m;
 assign mode_test = mode;
 assign fixed_point_test = fixed_point;
 assign count_test = count;
+assign index_start_test = index_start;
+assign index_end_test = index_end;
+assign enable_test = enable;
 
 assign data = (enable[3]) ? data_out: 32'hzzzzzzzz;
 
@@ -137,39 +140,31 @@ end
 
 
 //Reset Signals 
-always @(posedge clk) begin
-	if(rst) begin
-		index_start = 70;
-		index_end = 70;
-		index_end_temp = 70;
-		enable[4 : 0] = 5'b00101;
-		number = 0;
-		cmp1 = 0;
-		cmp2 = 0;
-		temp1 = 0;
-		temp2 = 0;
-		WR_RD1[0] = 1'b0;
-		WR_RD2[0] = 1'b0;
-		WR_RD3[0] = 1'b0;
-		WR_RD4[0] = 1'b0;
-		done[0] = 1'b0;
-		enable_step[0] = 1'b0;
-		enable_euler[0] = 1'b0;
+always @(posedge rst) begin
+	index_start = 70;
+	index_end = 70;
+	index_end_temp = 70;
+	enable[4 : 0] = 5'b00101;
+	number = 0;
+	cmp1 = 0;
+	cmp2 = 0;
+	temp1 = 0;
+	temp2 = 0;
+	WR_RD1[0] = 1'b0;
+	WR_RD2[0] = 1'b0;
+	WR_RD3[0] = 1'b0;
+	WR_RD4[0] = 1'b0;
+	done[0] = 1'b0;
+	enable_step[0] = 1'b0;
+	enable_euler[0] = 1'b0;
 
-		dec_index_start = 0;
-		start_address_reg = 0;
-	end
+	dec_index_start = 0;
+	start_address_reg = 0;
+	mul_temp2_reg = 0;
 end
 
 //Decode Data and Shift Decoded
-always @(posedge clk) begin
-	if(enable[0]) begin
-		done[0] = 1'b0;	
-		WR_RD1[0] = 1'b0;
-		WR_RD2[0] = 1'b0;
-		WR_RD3[0] = 1'b0;
-		WR_RD4[0] = 1'b0;	
-	end
+always @(negedge clk) begin
 	if(load_process && interrupt && enable[0]) begin	
 		//************* Shift Old Decoded Data *************//
 		index_end_temp = index_start - index_end;
@@ -191,6 +186,17 @@ always @(posedge clk) begin
 	end
 end
 
+//To Send Done for only one Clock not Twice
+always @(posedge clk) begin
+	if(enable[1] == 1'b0 && number<13) begin
+		done[0] = 1'b0;	
+		WR_RD1[0] = 1'b0;
+		WR_RD2[0] = 1'b0;
+		WR_RD3[0] = 1'b0;
+		WR_RD4[0] = 1'b0;	
+	end
+end
+
 //Write in Ram
 always @(posedge clk) begin
 	if(enable[1] && number<13) begin
@@ -203,11 +209,11 @@ always @(posedge clk) begin
 			n[5 : 0] = decoded[index_start -: 6];
 			
 			to_ram1[63 : 0] = { {58{1'b0}}, n[5 : 0] };
-			address1 = new_address;
+			address1[15 : 0] = new_address[15 : 0];
 			WR_RD1[0] = 1'b1;
 			
 			to_ram2[63 : 0] = { {58{1'b0}}, n[5 : 0] };
-			address2 = new_address;
+			address2[15 : 0] = new_address[15 : 0];
 			WR_RD2[0] = 1'b1;
 			
 			number[15 : 0] = new_number[15 : 0];
@@ -216,7 +222,7 @@ always @(posedge clk) begin
 			m[5 : 0] = decoded[index_start -: 6];
 			
 			to_ram1[63 : 0] = { {58{1'b0}}, m[5 : 0] };
-			address1 = new_address;
+			address1[15 : 0] = new_address[15 : 0];
 			WR_RD1[0] = 1'b1;
 	
 			number[15 : 0] = new_number[15 : 0];
@@ -226,9 +232,9 @@ always @(posedge clk) begin
 		
 			number[15 : 0] = new_number[15 : 0];
 			index_start[15 : 0] = new_start[15 : 0];
-		end else if((number == 4 || number ==3) && index_start - index_end >= 16) begin	 //H and Tolerance
+		end else if((number == 3 || number ==4) && index_start - index_end >= 16) begin	 //H and Tolerance
 			to_ram4[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
-			address4 = new_address;
+			address4[15 : 0] = new_address[15 : 0];
 			WR_RD4[0] = 1'b1;	
 
 			number[15 : 0] = new_number[15 : 0];
@@ -247,27 +253,27 @@ always @(posedge clk) begin
 		end else if (number>=7 && index_start - index_end >= 16) begin
 			if(number == 7) begin						//Matrix A
 				to_ram2[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address2 = new_address;
+				address2[15 : 0] = new_address[15 : 0];
 				WR_RD2[0] = 1'b1;	
 			end else if(number == 8) begin					//Matrix B
 				to_ram3[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address3 = new_address;
+				address3[15 : 0] = new_address[15 : 0];
 				WR_RD3[0] = 1'b1;
 			end else if(number == 9) begin					//Matrix X0
 				to_ram4[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address4 = new_address;
+				address4[15 : 0] = new_address[15 : 0];
 				WR_RD4[0] = 1'b1;
 			end else if(number == 10) begin					//Matrix T
 				to_ram1[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
-				address1 = new_address;
+				address1[15 : 0] = new_address[15 : 0];
 				WR_RD1[0] = 1'b1;
 
 				to_ram4[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
-				address4 = new_address;
+				address4[15 : 0] = new_address[15 : 0];
 				WR_RD4[0] = 1'b1;
 			end else begin							//Matrix U0 and Matrix Us
 				to_ram1[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address1 = new_address;
+				address1[15 : 0] = new_address[15 : 0];
 				WR_RD1[0] = 1'b1;
 			end
 			index_start = new_start; 
@@ -351,7 +357,7 @@ always @(posedge clk) begin
 	if(enable[4])
 		done[0] = 1'b0;
 	if(enable[4] && count > 0)	begin
-		address4 = 0 + n*j + i;
+		address4[15 : 0] = new_address[15 : 0];
 		WR_RD4[0] = 1'b0;
 
 		i = i + 1;
