@@ -9,6 +9,9 @@ sim:/io/done_cpu \
 sim:/io/number_test \
 sim:/io/temp1_test \
 sim:/io/temp2_test \
+sim:/io/index_start_test \
+sim:/io/index_end_test \
+sim:/io/enable_test \
 sim:/io/n_test \
 sim:/io/m_test \
 sim:/io/mode_test \
@@ -41,7 +44,6 @@ run
 run
 run
 run
-run
 force -freeze sim:/io/interrupt 1'b0 0
 run
 force -freeze sim:/io/data 32'b10100010100101110110100100011001 0
@@ -69,15 +71,10 @@ force -freeze sim:/io/data 32'b00011010000110100010101000010101 0
 force -freeze sim:/io/interrupt 1'b1 0
 run
 run
-run
-run
 force -freeze sim:/io/interrupt 1'b0 0
 run
 force -freeze sim:/io/data 32'b10010111011100011001000110010111 0
 force -freeze sim:/io/interrupt 1'b1 0
-run
-run
-run
 run
 run
 force -freeze sim:/io/interrupt 1'b0 0
@@ -87,11 +84,11 @@ force -freeze sim:/io/interrupt 1'b1 0
 run
 run
 run
+run
 force -freeze sim:/io/interrupt 1'b0 0
 run
 force -freeze sim:/io/data 32'b10010111011100011001001010010111 0
 force -freeze sim:/io/interrupt 1'b1 0
-run
 run
 run
 force -freeze sim:/io/interrupt 1'b0 0
@@ -112,6 +109,7 @@ force -freeze sim:/io/interrupt 1'b0 0
 run
 force -freeze sim:/io/data 32'b01110011010110010001100101110110 0
 force -freeze sim:/io/interrupt 1'b1 0
+run
 run
 run
 force -freeze sim:/io/interrupt 1'b0 0
@@ -135,7 +133,6 @@ force -freeze sim:/io/interrupt 1'b1 0
 run
 run
 run
-run
 force -freeze sim:/io/interrupt 1'b0 0
 run
 force -freeze sim:/io/data 32'b10100001100100101010011100011001 0
@@ -148,22 +145,16 @@ force -freeze sim:/io/data 32'b01001010001010010110100100101001 0
 force -freeze sim:/io/interrupt 1'b1 0
 run
 run
-run
-run
-run
-run
 force -freeze sim:/io/interrupt 1'b0 0
 run
 force -freeze sim:/io/data 32'b00101010011110100010101000101010 0
 force -freeze sim:/io/interrupt 1'b1 0
 run
 run
-run
 force -freeze sim:/io/interrupt 1'b0 0
 run
 force -freeze sim:/io/data 32'b00010110101000011001001010100110 0
 force -freeze sim:/io/interrupt 1'b1 0
-run
 run
 run
 run
