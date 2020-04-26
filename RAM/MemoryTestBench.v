@@ -4,7 +4,7 @@ module MemoryTestBench();
     localparam ADDRESS_WIDTH_1  = 10;
     localparam ADDRESS_WIDTH_2  = 12;
     localparam ADDRESS_WIDTH_3  = 12;
-    localparam ADDRESS_WIDTH_4  = 7;
+    localparam ADDRESS_WIDTH_4  = 10;
 
     reg                             clk;
     reg  [ADDRESS_WIDTH_1-1:0] address_1;
@@ -55,7 +55,7 @@ module MemoryTestBench();
         address_1 = 10'b0000000001;
         address_2 = 12'b000000000010;
         address_3 = 12'b000000000011;
-        address_4 = 7'b0000100;
+        address_4 = 10'b0000000100;
         
         toggle_clk;
         
