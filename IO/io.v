@@ -5,7 +5,7 @@ module io
     inout [31 : 0] data,
     output done_cpu,
     inout [63 : 0] ram1_data,ram2_data,ram3_data,ram4_data,
-    output [15 : 0] ram1_address,ram2_address,ram3_address,ram4_address,
+    output [11 : 0] ram1_address,ram2_address,ram3_address,ram4_address,
     output ram1_WR_RD, ram2_WR_RD, ram3_WR_RD, ram4_WR_RD,
     output en_step,en_euler,
     output [1 : 0] fixed_point_out,
@@ -26,7 +26,7 @@ reg [0 : 0] mode;
 reg [1 : 0] fixed_point;
 
 reg [63 : 0] to_ram1,to_ram2,to_ram3,to_ram4;
-reg [15 : 0] address1,address2,address3,address4;
+reg [11 : 0] address1,address2,address3,address4;
 reg [0 : 0] WR_RD1, WR_RD2, WR_RD3, WR_RD4;
 
 reg [0 : 0] enable_step,enable_euler;
@@ -90,51 +90,52 @@ Add_Sub #(16) e(number[15 : 0],16'b0000000000000001,new_number[15 : 0],overflow,
 
 // to calculate Ram addresses and indices for Data sent
 always @(negedge clk) begin
-	if(number == 0) begin
+	if(number == 0) begin			//n
 		dec_index_start = 6;
 		start_address_reg = 0;
-	end else if(number == 1) begin
+	end else if(number == 1) begin		//m
 		dec_index_start = 6;
-		start_address_reg = 0;
-	end else if(number == 2) begin
+		start_address_reg = 16'd901;
+	end else if(number == 2)		//mode
 		dec_index_start = 1;
-		start_address_reg = 0;
-	end else if(number == 3) begin
+	else if(number == 3) begin		//h
 		dec_index_start = 16;
 		start_address_reg = 0;
-	end else if(number == 4) begin
+	end else if(number == 4) begin		//tolerance
 		dec_index_start = 16;
 		start_address_reg = 0;
-	end else if(number == 5) begin
+	end else if(number == 5)		//fixed_point
 		dec_index_start = 2;
-		start_address_reg = 0;
-	end else if(number == 6) begin
+	else if(number == 6)			//count
 		dec_index_start = 4;
-		start_address_reg = 0;
-	end else if(number == 7) begin
+	else if(number == 7) begin		//matrix A
 		dec_index_start = 16;
 		mul_temp2_reg = {{26{1'b0}},n[5 : 0]};
 		start_address_reg = 0;
-	end else if(number == 8) begin
+	end else if(number == 8) begin		//matrix B
+		dec_index_start = 16;
+		mul_temp2_reg = {{26{1'b0}},m[5 : 0]};
+		start_address_reg = 0;
+	end else if(number == 9) begin		//matrix X0
+		dec_index_start = 16;
+		mul_temp2_reg = 0;
+		start_address_reg = 0;
+	end else if(number == 10) begin		//matrix T
+		dec_index_start = 16;
+		mul_temp2_reg = 0;
+		start_address_reg = 0;
+	end else if(number == 11) begin		//matrix U0
+		dec_index_start = 16;
+		mul_temp2_reg = 0;
+		start_address_reg = 0;
+	end else if(number == 12) begin		//matrix Us
+		dec_index_start = 16;
+		mul_temp2_reg = {{26{1'b0}},m[5 : 0]};
+		start_address_reg = 16'd50;
+	end else if(number == 13) begin		//matrix Results
 		dec_index_start = 16;
 		mul_temp2_reg = {{26{1'b0}},n[5 : 0]};
-		start_address_reg = 0;
-	end else if(number == 9) begin
-		dec_index_start = 16;
-		mul_temp2_reg = 0;
-		start_address_reg = 0;
-	end else if(number == 10) begin
-		dec_index_start = 16;
-		mul_temp2_reg = 0;
-		start_address_reg = 0;
-	end else if(number == 11) begin
-		dec_index_start = 16;
-		mul_temp2_reg = 0;
-		start_address_reg = 0;
-	end else if(number == 12) begin
-		dec_index_start = 16;
-		mul_temp2_reg = {{26{1'b0}},n[5 : 0]};
-		start_address_reg = 0;
+		start_address_reg = 16'd50;
 	end
 end
 
@@ -209,11 +210,11 @@ always @(posedge clk) begin
 			n[5 : 0] = decoded[index_start -: 6];
 			
 			to_ram1[63 : 0] = { {58{1'b0}}, n[5 : 0] };
-			address1[15 : 0] = new_address[15 : 0];
+			address1[11 : 0] = new_address[11 : 0];
 			WR_RD1[0] = 1'b1;
 			
 			to_ram2[63 : 0] = { {58{1'b0}}, n[5 : 0] };
-			address2[15 : 0] = new_address[15 : 0];
+			address2[11 : 0] = new_address[11 : 0];
 			WR_RD2[0] = 1'b1;
 			
 			number[15 : 0] = new_number[15 : 0];
@@ -222,7 +223,7 @@ always @(posedge clk) begin
 			m[5 : 0] = decoded[index_start -: 6];
 			
 			to_ram1[63 : 0] = { {58{1'b0}}, m[5 : 0] };
-			address1[15 : 0] = new_address[15 : 0];
+			address1[11 : 0] = new_address[11 : 0];
 			WR_RD1[0] = 1'b1;
 	
 			number[15 : 0] = new_number[15 : 0];
@@ -234,7 +235,7 @@ always @(posedge clk) begin
 			index_start[15 : 0] = new_start[15 : 0];
 		end else if((number == 3 || number ==4) && index_start - index_end >= 16) begin	 //H and Tolerance
 			to_ram4[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
-			address4[15 : 0] = new_address[15 : 0];
+			address4[11 : 0] = new_address[11 : 0];
 			WR_RD4[0] = 1'b1;	
 
 			number[15 : 0] = new_number[15 : 0];
@@ -253,27 +254,27 @@ always @(posedge clk) begin
 		end else if (number>=7 && index_start - index_end >= 16) begin
 			if(number == 7) begin						//Matrix A
 				to_ram2[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address2[15 : 0] = new_address[15 : 0];
+				address2[11 : 0] = new_address[11 : 0];
 				WR_RD2[0] = 1'b1;	
 			end else if(number == 8) begin					//Matrix B
 				to_ram3[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address3[15 : 0] = new_address[15 : 0];
+				address3[11 : 0] = new_address[11 : 0];
 				WR_RD3[0] = 1'b1;
 			end else if(number == 9) begin					//Matrix X0
 				to_ram4[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address4[15 : 0] = new_address[15 : 0];
+				address4[11 : 0] = new_address[11 : 0];
 				WR_RD4[0] = 1'b1;
 			end else if(number == 10) begin					//Matrix T
 				to_ram1[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
-				address1[15 : 0] = new_address[15 : 0];
+				address1[11 : 0] = new_address[11 : 0];
 				WR_RD1[0] = 1'b1;
 
 				to_ram4[63 : 0] = { {48{1'b0}}, decoded[index_start -: 16] };
-				address4[15 : 0] = new_address[15 : 0];
+				address4[11 : 0] = new_address[11 : 0];
 				WR_RD4[0] = 1'b1;
 			end else begin							//Matrix U0 and Matrix Us
 				to_ram1[63 : 0] = { {48{decoded[index_start]}}, decoded[index_start -: 16] };
-				address1[15 : 0] = new_address[15 : 0];
+				address1[11 : 0] = new_address[11 : 0];
 				WR_RD1[0] = 1'b1;
 			end
 			index_start = new_start; 
@@ -329,8 +330,8 @@ always @(posedge clk) begin
 		enable_step[0] = 1'b0;
 		enable_euler[0] = 1'b0;
 		enable[3] = 1'b1;
-		i = 0;
-		j = 0;
+		temp1 = 0;
+		temp2 = 0;
 		mode[0] = 0;
 	end
 end
@@ -357,15 +358,15 @@ always @(posedge clk) begin
 	if(enable[4])
 		done[0] = 1'b0;
 	if(enable[4] && count > 0)	begin
-		address4[15 : 0] = new_address[15 : 0];
+		address4[11 : 0] = new_address[11 : 0];
 		WR_RD4[0] = 1'b0;
 
-		i = i + 1;
-		if(j[3 : 0] == count[3 : 0] && i[5 : 0] == n[5 : 0])
+		temp1 = temp1 + 1;
+		if(temp2[3 : 0] == count[3 : 0] && temp1[5 : 0] == n[5 : 0])
 			enable[3] = 1'b0;
-		else if(i[5 : 0] == n[5 : 0]) begin
-			i = 0;
-			j = j + 1;
+		else if(temp1[5 : 0] == n[5 : 0]) begin
+			temp1 = 0;
+			temp2 = temp2 + 1;
 		end
 		enable[3] = 1'b1;
 		enable[4] = 1'b0;
