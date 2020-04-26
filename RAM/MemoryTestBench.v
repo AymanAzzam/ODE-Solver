@@ -24,23 +24,24 @@ module MemoryTestBench();
     reg                      WR_signal_3;
     reg                      WR_signal_4;
 
+    assign data_read_1 = data_write_1;
+    assign data_read_2 = data_write_2;
+    assign data_read_3 = data_write_3;
+    assign data_read_4 = data_write_4;
+
     RAM ram (.clk(clk),
             .address_1(address_1),
             .address_2(address_2),
             .address_3(address_3),
             .address_4(address_4),
-            .data_write_1(data_write_1),
-            .data_write_2(data_write_2),
-            .data_write_3(data_write_3),
-            .data_write_4(data_write_4),
+            .data_1(data_read_1),
+            .data_2(data_read_2),
+            .data_3(data_read_3),
+            .data_4(data_read_4),
             .WR_signal_1(WR_signal_1),
             .WR_signal_2(WR_signal_2),
             .WR_signal_3(WR_signal_3),
-            .WR_signal_4(WR_signal_4),
-            .data_read_1(data_read_1),
-            .data_read_2(data_read_2),
-            .data_read_3(data_read_3),
-            .data_read_4(data_read_4));
+            .WR_signal_4(WR_signal_4));
 
     initial begin
         
