@@ -176,9 +176,27 @@ always @(negedge clk) begin
 		index_end = 70 - index_end_temp;
 		//************* Decode New Data *************//
 		for(i = 31; i > 0; i = i - 4) begin
-			for(j = 0; j < data[i-1 -: 3]; j = j + 1) begin
+			if(data[i-1 -: 3] == 3'd1)begin
 				decoded[index_end] = data[i];
 				index_end = index_end - 1;
+			end else if(data[i-1 -: 3] == 3'd2) begin
+				decoded[index_end -: 2] = {2{data[i]}};
+				index_end = index_end - 2;
+			end else if(data[i-1 -: 3] == 3'd3) begin
+				decoded[index_end -: 3] = {3{data[i]}};
+				index_end = index_end - 3;
+			end else if(data[i-1 -: 3] == 3'd4) begin
+				decoded[index_end -: 4] = {4{data[i]}};
+				index_end = index_end - 4;
+			end else if(data[i-1 -: 3] == 3'd5) begin
+				decoded[index_end -: 5] = {5{data[i]}};
+				index_end = index_end - 5;
+			end else if(data[i-1 -: 3] == 3'd6) begin
+				decoded[index_end -: 6] = {6{data[i]}};
+				index_end = index_end - 6;
+			end else if(data[i-1 -: 3] == 3'd7) begin
+				decoded[index_end -: 7] = {7{data[i]}};
+				index_end = index_end - 7;
 			end
 		end
 		index_start = 70;
