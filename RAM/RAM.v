@@ -1,4 +1,4 @@
-module ram (clk,
+module RAM (clk,
             address_1,
             address_2,
             address_3,
@@ -44,10 +44,10 @@ module ram (clk,
     input                      WR_signal_3;
     input                      WR_signal_4;
     
-    reg  [DATA_WIDTH-1:0]   data_read_1;
-    reg  [DATA_WIDTH-1:0]   data_read_2;
-    reg  [DATA_WIDTH-1:0]   data_read_3;
-    reg  [DATA_WIDTH-1:0]   data_read_4;
+    reg  [DATA_WIDTH-1:0]   data_read_1_temp;
+    reg  [DATA_WIDTH-1:0]   data_read_2_temp;
+    reg  [DATA_WIDTH-1:0]   data_read_3_temp;
+    reg  [DATA_WIDTH-1:0]   data_read_4_temp;
     
     // RAM as multi-dimensional arrays
     reg [DATA_WIDTH-1:0] RAM_1 [ADDRESS_HEIGHT_1-1:0];
@@ -56,35 +56,40 @@ module ram (clk,
     reg [DATA_WIDTH-1:0] RAM_4 [ADDRESS_HEIGHT_4-1:0];
     
     always @(posedge clk) begin
-
+        
         if (WR_signal_1) begin
             RAM_1[address_1] <= data_write_1;
         end
         else begin
-            data_read_1 <= RAM_1[address_1];
+            data_read_1_temp <= RAM_1[address_1];
         end
-
+        
         if (WR_signal_2) begin
             RAM_2[address_2] <= data_write_2;
         end
         else begin
-            data_read_2 <= RAM_2[address_2];
+            data_read_2_temp <= RAM_2[address_2];
         end
-
+        
         if (WR_signal_3) begin
             RAM_3[address_3] <= data_write_3;
         end
         else begin
-            data_read_3 <= RAM_3[address_3];
+            data_read_3_temp <= RAM_3[address_3];
         end
-
+        
         if (WR_signal_4) begin
             RAM_4[address_4] <= data_write_4;
         end
         else begin
-            data_read_4 <= RAM_4[address_4];
+            data_read_4_temp <= RAM_4[address_4];
         end
-
+        
     end
-
+    
+    assign   data_read_1 = data_read_1_temp;
+    assign   data_read_2 = data_read_2_temp;
+    assign   data_read_3 = data_read_3_temp;
+    assign   data_read_4 = data_read_4_temp;
+    
 endmodule
