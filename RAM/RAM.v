@@ -3,18 +3,14 @@ module RAM (clk,
             address_2,
             address_3,
             address_4,
-            data_write_1,
-            data_write_2,
-            data_write_3,
-            data_write_4,
+            data_1,
+            data_2,
+            data_3,
+            data_4,
             WR_signal_1,
             WR_signal_2,
             WR_signal_3,
-            WR_signal_4,
-            data_read_1,
-            data_read_2,
-            data_read_3,
-            data_read_4);
+            WR_signal_4);
     
     parameter DATA_WIDTH       = 64;
     parameter ADDRESS_WIDTH_1  = 10;
@@ -32,65 +28,60 @@ module RAM (clk,
     input  [ADDRESS_WIDTH_2-1:0] address_2;
     input  [ADDRESS_WIDTH_3-1:0] address_3;
     input  [ADDRESS_WIDTH_4-1:0] address_4;
-    input  [DATA_WIDTH-1:0]   data_write_1;
-    input  [DATA_WIDTH-1:0]   data_write_2;
-    input  [DATA_WIDTH-1:0]   data_write_3;
-    input  [DATA_WIDTH-1:0]   data_write_4;
-    output [DATA_WIDTH-1:0]    data_read_1;
-    output [DATA_WIDTH-1:0]    data_read_2;
-    output [DATA_WIDTH-1:0]    data_read_3;
-    output [DATA_WIDTH-1:0]    data_read_4;
+    inout  [DATA_WIDTH-1:0]   data_1;
+    inout  [DATA_WIDTH-1:0]   data_2;
+    inout  [DATA_WIDTH-1:0]   data_3;
+    inout  [DATA_WIDTH-1:0]   data_4;
+    reg [DATA_WIDTH-1:0]    data_read_1;
+    reg [DATA_WIDTH-1:0]    data_read_2;
+    reg [DATA_WIDTH-1:0]    data_read_3;
+    reg [DATA_WIDTH-1:0]    data_read_4;
     input                      WR_signal_1;
     input                      WR_signal_2;
     input                      WR_signal_3;
     input                      WR_signal_4;
-    
-    reg  [DATA_WIDTH-1:0]   data_read_1_temp;
-    reg  [DATA_WIDTH-1:0]   data_read_2_temp;
-    reg  [DATA_WIDTH-1:0]   data_read_3_temp;
-    reg  [DATA_WIDTH-1:0]   data_read_4_temp;
     
     // RAM as multi-dimensional arrays
     reg [DATA_WIDTH-1:0] RAM_1 [ADDRESS_HEIGHT_1-1:0];
     reg [DATA_WIDTH-1:0] RAM_2 [ADDRESS_HEIGHT_2-1:0];
     reg [DATA_WIDTH-1:0] RAM_3 [ADDRESS_HEIGHT_3-1:0];
     reg [DATA_WIDTH-1:0] RAM_4 [ADDRESS_HEIGHT_4-1:0];
+
+    assign data_1 = WR_signal_1 ? 64'bz : data_read_1;
+    assign data_2 = WR_signal_2 ? 64'bz : data_read_2;
+    assign data_3 = WR_signal_3 ? 64'bz : data_read_3;
+    assign data_4 = WR_signal_4 ? 64'bz : data_read_4;
     
     always @(posedge clk) begin
         
         if (WR_signal_1) begin
-            RAM_1[address_1] <= data_write_1;
+            RAM_1[address_1] <= data_1;
         end
         else begin
-            data_read_1_temp <= RAM_1[address_1];
+            data_read_1 <= RAM_1[address_1];
         end
         
         if (WR_signal_2) begin
-            RAM_2[address_2] <= data_write_2;
+            RAM_2[address_2] <= data_2;
         end
         else begin
-            data_read_2_temp <= RAM_2[address_2];
+            data_read_2 <= RAM_2[address_2];
         end
         
         if (WR_signal_3) begin
-            RAM_3[address_3] <= data_write_3;
+            RAM_3[address_3] <= data_3;
         end
         else begin
-            data_read_3_temp <= RAM_3[address_3];
+            data_read_3 <= RAM_3[address_3];
         end
         
         if (WR_signal_4) begin
-            RAM_4[address_4] <= data_write_4;
+            RAM_4[address_4] <= data_4;
         end
         else begin
-            data_read_4_temp <= RAM_4[address_4];
+            data_read_4 <= RAM_4[address_4];
         end
         
     end
-    
-    assign   data_read_1 = data_read_1_temp;
-    assign   data_read_2 = data_read_2_temp;
-    assign   data_read_3 = data_read_3_temp;
-    assign   data_read_4 = data_read_4_temp;
     
 endmodule
