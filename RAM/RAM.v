@@ -20,13 +20,14 @@ module RAM (clk,
     parameter ADDRESS_WIDTH_1  = 10;
     parameter ADDRESS_WIDTH_2  = 12;
     parameter ADDRESS_WIDTH_3  = 12;
-    parameter ADDRESS_WIDTH_4  = 7;
-    parameter ADDRESS_HEIGHT_1 = 918; // = U0 : max 50 elements + U's: max 50 elements * 16 (time steps count) + U_interpolation : max 50 elements + N : 1 element + M : 1 element + T : max 16 elements
-    parameter ADDRESS_HEIGHT_2 = 2500; // = A : max 50 elements * 50 elements = 50 * 50
-    parameter ADDRESS_HEIGHT_3 = 2500; // = B : max 50 elements * 50 elements = 50 * 50
-    parameter ADDRESS_HEIGHT_4 = 69; // X : max 50 elements + H : 1 element + N : 1 element + Error Precision : 1 element + T : max 16 elements
+    parameter ADDRESS_WIDTH_4  = 10;
+    parameter ADDRESS_HEIGHT_1 = 918; // = N: 1 element + M: 1 element + T: max 16 elements + U0: max 50 elements + U's: max 50 elements * 16 (time steps count) + U_interpolation: max 50 elements
+    parameter ADDRESS_HEIGHT_2 = 2500; // = A: max 50 elements * 50 elements = 50 * 50
+    parameter ADDRESS_HEIGHT_3 = 2500; // = B: max 50 elements * 50 elements = 50 * 50
+    parameter ADDRESS_HEIGHT_4 = 1018; //  N: 1 element + T: max 16 elements + H: 1 element + Error Precision: 1 element  + X0: max 50 elements
+    // + X_stable: max 50 elements + X_n+1(h): max 50 elements + X_n+1(h/2): max 50 elements + X's: max 50 elements * 16
     
-    input                             clk;
+    input                              clk;
     input  [ADDRESS_WIDTH_1-1:0] address_1;
     input  [ADDRESS_WIDTH_2-1:0] address_2;
     input  [ADDRESS_WIDTH_3-1:0] address_3;
