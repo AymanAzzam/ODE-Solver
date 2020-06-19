@@ -47,4 +47,4 @@ The chip consists of four main modules, IO module, forward Euler solver, interpo
 [eq4]: Assets/eq4.png
 [eq5]: Assets/eq5.png
 [Xn1]: Assets/Xn1.png
-[ode-solver-design]: Assets\ode-solver-design.png
+[ode-solver-design]: Assets/ode-solver-design.png
